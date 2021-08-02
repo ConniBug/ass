@@ -32,7 +32,7 @@ const { name: ASS_NAME, version: ASS_VERSION } = require('./package.json');
 log.blank().info(`* ${ASS_NAME} v${ASS_VERSION} *`).blank();
 
 // Set up premium frontend
-const FRONTEND_NAME = 'conni-front'; // <-- Change this to use a custom frontend
+const FRONTEND_NAME = 'conni-ass-frontend'; // <-- Change this to use a custom frontend
 const ASS_PREMIUM = fs.existsSync(`./${FRONTEND_NAME}/package.json`) ? (require('submodule'), require(`./${FRONTEND_NAME}`)) : { enabled: false };
 
 //#region Variables, module setup
