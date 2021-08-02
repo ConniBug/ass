@@ -1,3 +1,6 @@
 [submodule "ass-x"]
 	path = ass-x
 	url = git@github.com:tycrek/ass-x.git
+[submodule "conni-ass-frontend"]
+	path = conni-ass-frontend
+	url = https://github.com/ConniBug/conni-ass-frontend
