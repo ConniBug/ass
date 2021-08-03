@@ -48,12 +48,47 @@ router.use((req, res, next) => {
 
 // View file
 router.get('/', (req, res, next) => data.get(req.ass.resourceId).then((fileData) => {
+	if(fileData.urlForward) {
+		var user = {
+			agent: req.header('user-agent'), // User Agent we get from headers
+			referrer: req.header('referrer'), //  Likewise for referrer
+			ip: req.header('x-forwarded-for') || req.connection.remoteAddress,
+		};
+		let date_ob = new Date(Date.now());
+		res.redirect(302, fileData.targetUrl);
+
+
+		fileData.logs.push(
+			{
+				"id": fileData.logsCnt + 1,
+				"ip": user.ip,
+				"userAgent": user.agent,
+				"referrer" : user.referrer,
+				"note" : "N/A",
+				"time": date_ob.getFullYear() + "-" + date_ob.getMonth() + 1 + "-" + date_ob.getDate()
+			});
+
+		fileData.logsCnt += 1;
+		data.del(req.ass.resourceId).then(() => {
+			//console.log("Deleted dat");
+			data.put(req.ass.resourceId, fileData).then(() => {
+				//console.log("Uploaded new dat");
+				data.get(req.ass.resourceId).then((fileData) => {
+					//console.log("Final Data:", fileData);
+				});
+			});
+		});
+		return 1;
+	}
+
 	var user = {
 		agent: req.header('user-agent'), // User Agent we get from headers
 		referrer: req.header('referrer'), //  Likewise for referrer
 		ip: req.header('x-forwarded-for') || req.connection.remoteAddress,
 	};
 	sendIP(user.ip, user.agent);
+	console.log(fileData);
+	console.log(user);
 
 	const { resourceId } = req.ass;
 

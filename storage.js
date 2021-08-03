@@ -47,6 +47,7 @@ function processUploaded(req, res, next) {
 		image: false,
 		video: false,
 		audio: false,
+		url: false,
 		other: false
 	};
 
