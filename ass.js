@@ -16,6 +16,7 @@ if (doSetup) {
 const { host, port, useSsl, isProxied, s3enabled } = require('./config.json');
 
 //#region Imports
+const handleCD = require("./cd.js").handleCD();
 const fs = require('fs-extra');
 const express = require('express');
 const nofavicon = require('@tycrek/express-nofavicon');
@@ -46,6 +47,11 @@ const ROUTERS = {
 const users = require('./auth');
 const data = require('./data');
 //#endregion
+
+var timeBetweenChecks = 10; // seconds
+setInterval(async function(){
+    handleCD();
+}, timeBetweenChecks * 1000);
 
 // Enable/disable Express features
 app.enable('case sensitive routing');
