@@ -26,10 +26,12 @@ function getTrueDomain(d = domain) {
 }
 
 function getS3url(s3key, ext) {
+	console.log("getS3url(s3key, ext):   ", `https://${s3usePathStyle ? `${s3endpoint}/${s3bucket}` : `${s3bucket}.${s3endpoint}`}/${s3key}${ext}`);
 	return `https://${s3usePathStyle ? `${s3endpoint}/${s3bucket}` : `${s3bucket}.${s3endpoint}`}/${s3key}${ext}`;
 }
 
 function getDirectUrl(resourceId) {
+	console.log("getDirectUrl(resourceId):   ", `${getTrueHttp()}${getTrueDomain()}/${resourceId}/direct`);
 	return `${getTrueHttp()}${getTrueDomain()}/${resourceId}/direct`;
 }
 

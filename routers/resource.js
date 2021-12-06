@@ -87,18 +87,43 @@ router.get('/', (req, res, next) => data.get(req.ass.resourceId).then((fileData)
 }).catch(next));
 
 // Direct resource
-router.get('/direct*', (req, res, next) => data.get(req.ass.resourceId).then((fileData) => {
+router.get('/embed-d*', (req, res, next) => data.get(req.ass.resourceId).then((fileData) => {
+	console.log("/embed-d");
 	// Send file as an attachement for downloads
 	if (req.query.download)
 		res.header('Content-Disposition', `attachment; filename="${fileData.originalname}"`);
-
+	
 	// Return the file differently depending on what storage option was used
 	const uploaders = {
 		s3: () => fetch(getS3url(fileData.randomId, fileData.ext)).then((file) => {
 			file.headers.forEach((value, header) => res.setHeader(header, value));
 			file.body.pipe(res);
-		}),
-		local: () => {
+		}),local: () => {
+			res.header('Accept-Ranges', 'bytes').header('Content-Length', fileData.size).type(fileData.mimetype);
+			fs.createReadStream(fileData.path).pipe(res);
+		}
+	};
+
+	uploaders[s3enabled ? 's3' : 'local']();
+}).catch(next));
+
+// Direct resource
+router.get('/direct*', (req, res, next) => data.get(req.ass.resourceId).then((fileData) => {
+		
+	console.log("/direct");
+	// Send file as an attachement for downloads
+	if (req.query.download)
+		res.header('Content-Disposition', `attachment; filename="${fileData.originalname}"`);
+	
+	// Return the file differently depending on what storage option was used
+	const uploaders = {
+		s3: () => {
+			res.statusCode = 302;
+			res.setHeader("Location", getS3url(fileData.randomId, fileData.ext));
+			res.end();
+			//console.log("Sending: ", getS3url(fileData.randomId, fileData.ext));
+			//res.send(getS3url(fileData.randomId, fileData.ext));
+		},local: () => {
 			res.header('Accept-Ranges', 'bytes').header('Content-Length', fileData.size).type(fileData.mimetype);
 			fs.createReadStream(fileData.path).pipe(res);
 		}
