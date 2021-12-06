@@ -16,7 +16,7 @@ if (doSetup) {
 const { host, port, useSsl, isProxied, s3enabled } = require('./config.json');
 
 //#region Imports
-const handleCD = require("./cd.js").handleCD();
+const handleCD = require("./cd.js").handleCD;
 const fs = require('fs-extra');
 const express = require('express');
 const nofavicon = require('@tycrek/express-nofavicon');
