@@ -1,3 +1,3 @@
 <div align="center">
-  <img height="100%" alt="ass" src="http://media.spookiebois.club:8080/4QrDnTIS2i8D/direct">
+  <img height="100%" alt="Spookie" src="http://media.spookiebois.club:8080/qahEiWWLB4IC/direct">
 </div>
