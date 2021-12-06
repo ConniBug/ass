@@ -8,6 +8,7 @@
     "npm": ">=7.x.x"
   },
   "scripts": {
+    "prestart": "npm i",
     "start": "node ass.js",
     "setup": "node setup.js",
     "metrics": "node metrics.js",
